@@ -1,96 +1,97 @@
 import desmoj.core.dist.LinearCongruentialRandomGenerator;
 
+import java.util.Random;
+
 public class Main {
 
-    static class KS
+    public static double[] quickSort(double[] array,int inicio, int fim)
     {
-
-        double[] quickSort(double[] array,int inicio, int fim)
+        if(inicio>=fim)
         {
-            if(inicio>=fim)
-            {
-                return array;
-            }
-            int meio = inicio + (fim-inicio)/2,i = inicio, j = fim;
-            double pivo = array[meio];
-            while(i <= j)
-            {
-                while(array[i]<pivo)
-                {
-                    i++;
-                }
-                while(array[j]>pivo)
-                {
-                    j--;
-                }
-                if(i<=j)
-                {
-                    double tmp = array[i];
-                    array[i] = array[j];
-                    array[j] = tmp;
-                    i++;
-                    j--;
-                }
-            }
-            if(inicio < j)
-            {
-                quickSort(array,inicio,j);
-            }
-            if(fim > i)
-            {
-                quickSort(array,i,fim);
-            }
             return array;
         }
-
-        void test(double numeros[], double alfa)
+        int meio = inicio + (fim-inicio)/2,i = inicio, j = fim;
+        double pivo = array[meio];
+        while(i <= j)
         {
-            numeros = quickSort(numeros,0,numeros.length-1);
-            double array1[] = new double[numeros.length], array2[] = new double[numeros.length];
-            int n = numeros.length;
-            for(int i=0;i<n;i++)
+            while(array[i]<pivo)
             {
-                array1[i] = ((i+1)/n)-numeros[i];
-                array2[i] = (numeros[i]-i)/n;
+                i++;
             }
+            while(array[j]>pivo)
+            {
+                j--;
+            }
+            if(i<=j)
+            {
+                double tmp = array[i];
+                array[i] = array[j];
+                array[j] = tmp;
+                i++;
+                j--;
+            }
+        }
+        if(inicio < j)
+        {
+            quickSort(array,inicio,j);
+        }
+        if(fim > i)
+        {
+            quickSort(array,i,fim);
+        }
+        return array;
+    }
 
-            double maxArray1 = array1[0];
-            for(int i=0;i<n;i++)
-            {
-                if(maxArray1<array1[i])
-                {
-                    maxArray1 = array1[i];
-                }
-            }
+    public static void test(double numeros[])
+    {
+        numeros = quickSort(numeros,0,numeros.length-1);
+        double array1[] = new double[numeros.length], array2[] = new double[numeros.length];
+        double n = (double)numeros.length;
+        for(int i=0;i<n;i++)
+        {
+            array1[i] =( (double)i)/n - numeros[i];
+            array2[i] = numeros[i] - ((((double)i)-1)/n);
+        }
 
-            double maxArray2 = array2[0];
-            for(int i=0;i<n;i++)
+        double dmais = array1[0];
+        double dmenos = array2[0];
+        for(int i=0;i<n;i++)
+        {
+            if(dmais<array1[i])
             {
-                if(maxArray2<array2[i])
-                {
-                    maxArray2 = array2[i];
-                }
+                dmais = array1[i];
             }
-
-            if(alfa>Math.max(maxArray1,maxArray2))
+            if(dmenos<array2[i])
             {
-                System.out.println("Numeros uniformes aceites!");
+                dmenos = array2[i];
             }
-            else
-            {
-                System.out.println("Numeros uniformes nao aceites!");
-            }
+        }
+        double d = Math.max(dmais, dmenos);
+        d = (Math.sqrt(n) + 0.12 + (0.11/Math.sqrt(n))) * d;
+        if(d<1.358)
+        {
+            System.out.println("Teste aceite!");
+        }
+        else
+        {
+            System.out.println("Teste nao aceites!");
         }
     }
 
 
+
     public static void main(String[] args) {
-        double numeros[] = new double[60000];
-        LinearCongruentialRandomGenerator generator = new LinearCongruentialRandomGenerator();
-        for(int i=0;i<numeros.length;i++) {
-            numeros[i] = generator.nextDouble();
+        int n = 60000;
+        int k = 42;
+        double numeros[];
+        LinearCongruentialRandomGenerator generator;
+        for(int i=0;i<k;i++){
+            numeros = new double[n];
+            generator = new LinearCongruentialRandomGenerator(new Random().nextInt());
+            for (int a = 0;a < numeros.length; a++) {
+                numeros[a] = generator.nextDouble();
+            }
+            test(numeros);
         }
-        KS ks = new KS();
-        ks.test(numeros,0.05);
     }
 }
