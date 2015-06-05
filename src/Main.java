@@ -42,7 +42,7 @@ public class Main {
         }
         if(fim > i)
         {
-            quickSort(array,i,fim);
+            quickSort(array, i, fim);
         }
         return array;
     }
@@ -155,21 +155,124 @@ public class Main {
         }
     }
 
+    public static int[] getruns(double[] array){
+        int[] runs = new int[6];
+        int tamanho=1;
+        for(int i =0;i<6;i++){
+            runs[i] = 0;
+        }
+        for(int i =1;i<array.length;i++){
+            if(array[i]<=array[i-1]){
+                if(tamanho>6){
+                    tamanho = 6;
+                }
+                runs[tamanho-1]++;
+                tamanho = 1;
+            }
+            else{
+                tamanho++;
+            }
+
+        }
+        if(tamanho>6){
+            tamanho = 6;
+        }
+        runs[tamanho-1]++;
+        return runs;
+    }
+
+    public static void runstest(double[] array){
+        int runs[];
+        double b[] = {1.0/6.0,5.0/24.0,11.0/120.0,19.0/720.0,29.0/5040.0,1.0/840.0};
+        double[][] a =
+                        {{4529.4,9044.9,13568.0,18091.0,22615.0,27892.0},
+                        {9044.9,18097.0,27139.0,36187.0,45234.0,55789.0},
+                        {13568.0,27139.0,40721.0,54281.0,67852.0,83685.0},
+                        {18091.0,36187.0,54281.0,72414.0,90470.0,11580.0},
+                        {22615.0,45234.0,67852.0,91470.0,113262.0,139476.0},
+                        {27892.0,55789.0,83685.0,111580.0,139476.0,172860.0}};
+        int n = array.length;
+        runs = getruns(array);
+        double sum =0;
+        for(int i=0;i<6;i++){
+            for(int j=0;j<6;j++){
+                sum+=(a[i][j]*(runs[i] - n*b[i])*(runs[j]-n*b[j]));
+            }
+        }
+        double r = sum/n;
+        if(r<12.592){
+            System.out.println("Passou no runstest");
+        }
+        else{
+            System.out.println("Não passou no runstest");
+        }
+    }
+
+    public static double geta0(double array[]){
+        double sum =0;
+        double sum2 = 0;
+        int n = array.length;
+        for(int i =0;i<n;i++){
+            sum+= ((Math.pow(Math.log(array[i]),2)));
+            sum2+= Math.log(array[i]);
+        }
+        double aux = Math.pow(((sum - (Math.pow(sum2,2)/n))*(6.0/Math.pow(Math.PI,2)))/(n-1),-1.0/2.0);
+        return aux;
+    }
+
+    public static double geta(double array[]){
+        double sum = 0;
+        for(int i=0;i<array.length;i++){
+            sum+= Math.log(array[i]);
+        }
+        return sum/array.length;
+    }
+
+    public static void findmle(double array[]){
+        double a0 = geta0(array);
+        double ak,ak1;
+        double aux = a0;
+        double a = geta(array);
+        int n = array.length;
+        do{
+            ak = aux;
+            double c=0;
+            double b=0;
+            double h=0;
+            for(int i=0;i<n;i++){
+                c+=(Math.pow(array[i],ak)*Math.log(array[i]));
+                b+=Math.pow(array[i],ak);
+                h+= (Math.pow(array[i],ak)*(Math.log(array[i])));
+            }
+            ak1 = ak + ((a + 1/ak - c/b)/(1/Math.pow(ak,2) + (b*h - Math.pow(c,2))/Math.pow(b,2)));
+            aux = ak1;
+        } while(Math.abs(ak-ak1) < Math.pow(10,-3));
+
+        System.out.println("Alpha = " + ak1);
+        double beta = 0;
+        for(int i=0;i<n;i++){
+            beta+=Math.pow(array[i],ak1);
+        }
+        beta = Math.pow((beta/n),1.0/ak1);
+        System.out.println("Beta = " + beta);
+    }
+
 
     public static void main(String[] args) {
         //Exercicio 1
-        int n = 60000;
+        int n = 600000;
         int k = 42;
         double numeros[];
         LinearCongruentialRandomGenerator generator;
         System.out.println("Exercicio 1");
         for(int i=0;i<k;i++){
             numeros = new double[n];
-            generator = new LinearCongruentialRandomGenerator(new Random().nextInt());
+            generator = new LinearCongruentialRandomGenerator(i);
             for (int a = 0;a < numeros.length; a++) {
                 numeros[a] = generator.nextDouble();
             }
-            kstest(numeros);
+            runstest(numeros);
+            //kstest(numeros);
         }
 
 
@@ -190,11 +293,22 @@ public class Main {
 
         //Exercicio 3
         scanner.nextLine();
-        System.out.println("Exercicio 3");
+        System.out.println("Exercicio 3 a)");
         double[] machines1 = new double[200];
-        readvalues(machines1,"Machines.txt");
+        readvalues(machines1, "Machines.txt");
         double[] machines2 = new double[200];
-        readvalues(machines2,"Machines2.txt");
-        kwtest(machines1,machines2);
+        readvalues(machines2, "Machines2.txt");
+        kwtest(machines1, machines2);
+
+        scanner.nextLine();
+        machines1 = new double[200];
+        readvalues(machines1, "Machines.txt");
+        machines2 = new double[200];
+        readvalues(machines2, "Machines2.txt");
+        System.out.println("Exercicio 3 b)");
+        System.out.println("Maquina 1:");
+        findmle(machines1);
+        System.out.println("Maquina 2:");
+        findmle(machines2);
     }
 }
